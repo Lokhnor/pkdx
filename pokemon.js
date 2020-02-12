@@ -12,20 +12,25 @@ async function getPokemon() {
 }
 
 async function getPokemonById(id) {
-  const pokemon = await getPokemon();
-  return pokemon.find(item => item.pkdx_id == id);
+  const pokemon = await query(`SELECT * FROM pokemon WHERE pkdx_id = $1`, [id]);
+  return pokemon.rows[0];
 }
 
 async function getPokemonByName(input) {
-  const pokemon = await getPokemon();
-  return pokemon.find(item => item.name.toLowerCase() == input.toLowerCase());
+  const pokemon = await query(
+    `SELECT * FROM pokemon WHERE name ILIKE '%' || $1 || '%'`,
+    [input]
+  );
+  return pokemon.rows[0];
 }
 
 async function getPokemonBySearch(input) {
-  const pokemon = await getPokemon();
-  const returnedPokemon = pokemon.filter(item =>
-    item.name.toLowerCase().includes(input.toLowerCase())
+  const pokemon = await query(
+    `SELECT * FROM pokemon WHERE name ILIKE '%' || $1 || '%'`,
+    [input]
   );
+  const returnedPokemon = pokemon.rows;
+
   function compare(a, b) {
     if (a.name < b.name) {
       return -1;
@@ -38,10 +43,14 @@ async function getPokemonBySearch(input) {
   return returnedPokemon.sort(compare);
 }
 
-async function savePokemon(input) {
-  const pokemonArray = await getPokemon();
-  const newArray = pokemonArray.push(input);
-  await writeFile("./pokedex.json", JSON.stringify(newArray));
+async function savePokemon(pokemon) {
+  const { pkdx_id, name, description, img_url, types, evolutions } = pokemon;
+  const pokemonArray = await query(
+    `INSERT INTO pokemon (pkdx_id, name, description, img_url, types, evolutions) VALUES ($1,$2,$3,$4,$5,$6)`,
+    [pkdx_id, name, description, img_url, types, evolutions]
+  );
+  console.log(pokemonArray);
+  return pokemonArray;
 }
 
 module.exports = {
