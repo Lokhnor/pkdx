@@ -1,6 +1,6 @@
 // const fs = require("fs");
 // const { promisify } = require("util");
-const { query } = require("./db/index");
+const { query } = require("../db/index");
 
 // const readFile = promisify(fs.readFile);
 // const writeFile = promisify(fs.writeFile);
@@ -53,10 +53,30 @@ async function savePokemon(pokemon) {
   return pokemonArray;
 }
 
+async function deletePokemonById(id) {
+  const res = await query(
+    `DELETE FROM pokemon WHERE pkdx_id = $1 RETURNING name`,
+    [id]
+  );
+  const { name } = res.rows[0];
+  console.log(res);
+  return name;
+}
+
+async function editPokemonByName(name, updateName) {
+  const res = await query(`UPDATE pokemon SET name = $1 WHERE name = $2 `, [
+    name,
+    updateName
+  ]);
+  return res;
+}
+
 module.exports = {
   getPokemon,
   getPokemonById,
   getPokemonByName,
   getPokemonBySearch,
-  savePokemon
+  savePokemon,
+  deletePokemonById,
+  editPokemonByName
 };

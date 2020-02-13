@@ -6,15 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev": "node app.js",
-    "createTable": "node ./db/scripts/create_table.js",
-    "upload": "node ./db/scripts/upload_pokemon.js",
-    "dropTable": "node ./db/scripts/drop_table.js",
+    "dev": "node -r dotenv/config app.js",
+    "createTable": "node -r dotenv/config ./db/scripts/create_table.js",
+    "upload": "node -r dotenv/config ./db/scripts/upload_pokemon.js",
+    "dropTable": "node -r dotenv/config ./db/scripts/drop_table.js",
     "db:reset": "npm run dropTable && npm run createTable && npm run upload"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "pg": "^7.18.1"
   },
